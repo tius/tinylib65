@@ -26,7 +26,6 @@
 ;   SOFTWARE.
 ;------------------------------------------------------------------------------
 .include "config.inc"
-.include "global.inc"
 .include "tinylib65.inc"
 ;------------------------------------------------------------------------------
 buffer = $2000
@@ -54,6 +53,8 @@ sd_test:
 @error:
     lda last_error
     jsr print_hex8
-    jmp mon_err
+    lda #'?'
+    jsr print_char
+    jmp print_crlf
 
 ;==============================================================================

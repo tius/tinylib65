@@ -26,7 +26,6 @@
 ;   SOFTWARE.
 ;------------------------------------------------------------------------------
 .include "config.inc"
-.include "global.inc"
 .include "tinylib65.inc"
 
 .code
@@ -46,7 +45,9 @@ fat32_test:
 @error:
     lda last_error
     jsr print_hex8
-    jmp mon_err
+    lda #'?'
+    jsr print_char
+    jmp print_crlf
   
 ;==============================================================================
 _x_test1:

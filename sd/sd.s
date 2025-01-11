@@ -203,8 +203,7 @@ sd_read_sector:                         ; (sector32 addr --)
 ;------------------------------------------------------------------------------
 .if DEBUG_SD
     lda #'R'
-    jsr print_char
-    jsr print_space
+    jsr print_char_space
     PRINT_HEX32 { stack + 2, x }
     jsr print_crlf
 .endif

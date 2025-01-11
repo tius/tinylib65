@@ -75,7 +75,8 @@ serial_in_line:
     cpx #0
     beq @loop
     jsr serial_out_char       
-    jsr print_space
+    lda #$20
+    jsr serial_out_char       
     lda #$08
     jsr serial_out_char       
     dex      
@@ -90,7 +91,8 @@ serial_in_line:
 @done:
     stz input_buffer, x
     stz input_idx
-    jmp print_cr
+    lda #$0d
+    jmp serial_out_char
 
 ;==============================================================================
 serial_in_line_no_echo:
