@@ -2,6 +2,9 @@
 ;
 ;   zero page locations used by the utility functions
 ;
+;   see also:
+;       - README.md
+;
 ;------------------------------------------------------------------------------
 ;   MIT License
 ;
