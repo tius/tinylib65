@@ -26,7 +26,7 @@
 ;   SOFTWARE.
 ;------------------------------------------------------------------------------
 .include "config.inc"
-.include "utils.inc"
+.include "tinylib65.inc"
 .include "xmodem.inc"
 
 .code

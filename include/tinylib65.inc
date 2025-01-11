@@ -1,4 +1,4 @@
-;   utils.inc
+;   tinylib65.inc
 ;
 ;   some useful helper functions
 ;
@@ -43,13 +43,6 @@
 
 .global     input_buffer
 .global     fat32_buffer
-
-;------------------------------------------------------------------------------
-;   hardware vector handlers
-
-.global     res_handler
-.global     irq_handler
-.global     nmi_handler
 
 ;==============================================================================
 ;   modules
