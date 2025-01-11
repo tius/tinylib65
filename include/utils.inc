@@ -37,7 +37,7 @@
 .include "macros/macros_stack.inc"
 
 ;==============================================================================
-;   external symbols
+;   external symbols (to be provided by the user)
 ;------------------------------------------------------------------------------
 ;   bss data
 
@@ -54,19 +54,15 @@
 ;==============================================================================
 ;   modules
 ;------------------------------------------------------------------------------
-;   data_zp.s
+;   tinylib65_zp
 
 .globalzp   tmp0, tmp1, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, tmp7
 .globalzp   r0, r1, r2, r3, r4, r5, r6, r7
-.globalzp   w0, w0l, w0h
-.globalzp   w1, w1l, w1h
+.globalzp   w0, w0l, w0h, w1, w1l, w1h
 .globalzp   last_error
-.globalzp   xmem_access
-.globalzp   xmem_op
-.globalzp   xmem_rts
 
 ;------------------------------------------------------------------------------
-;   delay_cycles.s
+;   delay
 
 .global delay12
 .global delay14
@@ -77,21 +73,18 @@
 .global delay19
 .global delay20
 
-;------------------------------------------------------------------------------
-;   delay_ms.s
-
 .global delay_ms
 
 ;------------------------------------------------------------------------------
-;   fat32.s
+;   fat32
 
+;   error codes
 FAT32_ERR_BASE      = $20
 FAT32_ERR_MBR       = FAT32_ERR_BASE + 0
 FAT32_ERR_PARTITION = FAT32_ERR_BASE + 1
 FAT32_ERR_BPB       = FAT32_ERR_BASE + 2
 
 .globalzp   fat32_dirent
-
 .global     fat32_init
 .global     fat32_openrootdir
 .global     fat32_readdir
@@ -102,9 +95,10 @@ FAT32_ERR_BPB       = FAT32_ERR_BASE + 2
 .global     fat32_test
 
 ;------------------------------------------------------------------------------
-;   input.s
+;   input
 
 .globalzp   input_idx
+
 .global     input_char
 .global     input_skip_spaces
 .global     input_hex
@@ -114,17 +108,13 @@ FAT32_ERR_BPB       = FAT32_ERR_BASE + 2
 .global     input_bin8
 
 ;------------------------------------------------------------------------------
-;   instruction_size.s
-
-.global instruction_size
-
-;------------------------------------------------------------------------------
-;   misc.s
+;   misc
 
 .global     inc_w0
+.global     instruction_size
 
 ;------------------------------------------------------------------------------
-;   print.s
+;   print
 
 .global     print_hex4
 .global     print_hex8
@@ -141,8 +131,9 @@ FAT32_ERR_BPB       = FAT32_ERR_BASE + 2
 .global     print_hex_bytes_crlf
 
 ;------------------------------------------------------------------------------
-;   sd.s
+;   sd
 
+;   error codes
 SD_ERR_BASE         = $10
 SD_ERR_CMD0         = SD_ERR_BASE + 0
 SD_ERR_CMD8         = SD_ERR_BASE + 1
@@ -156,13 +147,14 @@ SD_ERR_READ         = SD_ERR_BASE + 5
 .global     sd_test
 
 ;------------------------------------------------------------------------------
-;   serial output
+;   serial 
 
 .global     serial_out_char
 
 ;------------------------------------------------------------------------------
 ;   serial input
 
+;   timeout values
 SERIAL_IN_TIMEOUT_2S   := 3
 SERIAL_IN_TIMEOUT_10S  := 14
 SERIAL_IN_TIMEOUT_60S  := 83
@@ -174,7 +166,7 @@ SERIAL_IN_TIMEOUT_60S  := 83
 .global     serial_in_char_timeout
 
 ;------------------------------------------------------------------------------
-;   x_stack.s
+;   x_stack
 
 stack       = $00                       ; zeropage stack base address
 STACK_INIT  = $00                       ; stack starts at $FF and grows downwards
@@ -197,14 +189,7 @@ STACK_INIT  = $00                       ; stack starts at $FF and grows downward
 .global     x_memdump_cols
 
 ;------------------------------------------------------------------------------
-;   xmem.s
-;------------------------------------------------------------------------------
-.global     xmem_init
-.global     xmem_set
-.global     xmem_clr
-
-;------------------------------------------------------------------------------
-;   xmodem.s
+;   xmodem
 
 .global     xmodem_receive
 .global     xmodem_send
