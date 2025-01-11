@@ -48,12 +48,12 @@ delay_ms:
 
 @inner_loop:
     dec                                 ; 2
-    bne @inner_loop                     ; 3 / 2
+    ASSERT_BRANCH_PAGE bne, @inner_loop ; 3 / 2
     ; 985 total for inner loop (n * 5 - 1)
 
     pla                                 ; 4
     dec                                 ; 2
-    ASSERT_BRANCH_PAGE bne, @outer_loop ; 3 / 2    
+    bne @outer_loop                     ; 3(4) / 2      ignore page branches
     ; A * 999 - 1 total for outer loop
 
     rts                                 ; 6 + 6            
