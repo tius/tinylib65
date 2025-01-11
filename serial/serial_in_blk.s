@@ -1,4 +1,4 @@
-;   serial_in_vsize.s
+;   serial_in_blk.s
 ;
 ;   read block with len byte at wire speed, timeout 0.72 s per byte
 ;
@@ -33,7 +33,7 @@
 .include "serial_in.inc"
 
 ;==============================================================================
-serial_in_vsize:
+serial_in_blk:
 ;------------------------------------------------------------------------------
 ;   read block with len byte at wire speed, timeout 0.72 s per byte
 ;
@@ -49,9 +49,7 @@ serial_in_vsize:
 ;       buffer      received bytes
 ;
 ;------------------------------------------------------------------------------
-buffer := $2000                         ; buffer for received bytes
-
-    ldy #$ff                            ; byte counter is incremented at start of loop
+    ldy #0                              ; byte counter
     ldx #0                              ; 0.72 s initial timeout
 
 @loop:    
@@ -73,9 +71,9 @@ buffer := $2000                         ; buffer for received bytes
     INPUT_BYTE_SHORT                    ; 140 (7 initial delay), X = 0
 
     ply                                 ; 4
-    sta buffer, y                       ; 5
+    sta serial_buffer - 1, y            ; 5
 
-    cpy buffer                          ; 4     1st byte is size
+    cpy serial_buffer                   ; 4     1st byte is size
     ASSERT_BRANCH_PAGE bne, @loop       ; 3/2
                                         ; 170   total loop time
 ;   C = 1

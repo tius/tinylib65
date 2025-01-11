@@ -3,7 +3,7 @@
 ;   helper functions for printing
 ;
 ;   prerequisites:
-;       - print_char (must preserve tmp6 and tmp7)
+;       - print_char (must preserve tmp6 and tmp7!)
 ;
 ;------------------------------------------------------------------------------
 ;   MIT License
@@ -41,13 +41,6 @@ print_inline_asciiz:
 ;   see also:
 ;       - http://6502.org/source/io/primm.htm
 ;       - http://wilsonminesco.com/stacks/inlinedData.html
-;------------------------------------------------------------------------------
-;   avoid overhead of saving tmp6 and tmp7
-
-.if !PRINT_CHAR_PRESERVES_TMP67
-    .error "print_char must preserve tmp6 and tmp7"
-.endif
-
 ;------------------------------------------------------------------------------
     pla
     sta tmp6

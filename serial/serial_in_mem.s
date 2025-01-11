@@ -1,4 +1,4 @@
-;   serial_in_block.s
+;   serial_in_mem.s
 ;
 ;   see also: 
 ;       - serial_in.inc
@@ -31,7 +31,7 @@
 .include "serial_in.inc"
 
 ;==============================================================================
-serial_in_block:
+serial_in_mem:
 ;------------------------------------------------------------------------------
 ;   read block of 1..256 bytes at wire speed, timeout 0.72 s per byte
 ;

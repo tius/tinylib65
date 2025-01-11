@@ -37,12 +37,26 @@
 .include "macros/macros_stack.inc"
 
 ;==============================================================================
+;   default values
+;------------------------------------------------------------------------------
+.ifndef DEBUG_SD
+    .define DEBUG_SD                0
+.endif
+.ifndef DEBUG_FAT32
+    .define DEBUG_FAT32             0
+.endif
+.ifndef print_char
+    .define print_char              serial_out_char
+.endif
+
+;==============================================================================
 ;   external symbols (to be provided by the user)
 ;------------------------------------------------------------------------------
 ;   bss data
 
 .global     input_buffer
 .global     fat32_buffer
+.global     serial_buffer           ; for serial_in_blk
 
 ;==============================================================================
 ;   modules
@@ -157,6 +171,8 @@ SERIAL_IN_TIMEOUT_60S  := 83
 .global     serial_in_line
 .global     serial_in_xmodem
 .global     serial_in_char_timeout
+.global     serial_in_mem
+.global     serial_in_blk
 
 ;------------------------------------------------------------------------------
 ;   x_stack

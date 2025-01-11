@@ -55,6 +55,8 @@
 ;   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 ;   SOFTWARE.
 ;------------------------------------------------------------------------------
+.ifdef SD_PORT
+
 .include "config.inc"
 .include "tinylib65.inc"
 
@@ -493,4 +495,4 @@ _waitresult:
 ;     rts
 ; .endif
     
-    
+.endif    
