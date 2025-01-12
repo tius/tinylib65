@@ -5,7 +5,7 @@
 ;   config:
 ;       SERIAL_OUT_PORT             output register
 ;       SERIAL_OUT_PORT_PIN         output pin number (0 for fastest code)
-;       SERIAL_OUT_PORT_DEFAULT     output register default state
+;       SERIAL_OUT_PORT_IDLE     output register default state
 ;       SERIAL_OUT_PORT_PRESERVE    preserve output port state
 ;
 ;   requirements:
@@ -49,6 +49,8 @@
 ;------------------------------------------------------------------------------
 .include "config.inc"
 .include "tinylib65.inc"
+
+.ifdef SERIAL_OUT_PORT
 
 .code
 ;==============================================================================
@@ -152,10 +154,10 @@ serial_out_char:
 ;   do NOT preserve output port state
 ;
 ;   caveat:
-;       - resets output port to SERIAL_OUT_PORT_DEFAULT after each byte    
+;       - resets output port to SERIAL_OUT_PORT_IDLE after each byte    
 ;##############################################################################
-_OUT_LO := SERIAL_OUT_PORT_DEFAULT ^ (1 << SERIAL_OUT_PORT_PIN) 
-_OUT_HI := SERIAL_OUT_PORT_DEFAULT | (1 << SERIAL_OUT_PORT_PIN)
+_OUT_LO := SERIAL_OUT_PORT_IDLE ^ (1 << SERIAL_OUT_PORT_PIN) 
+_OUT_HI := SERIAL_OUT_PORT_IDLE | (1 << SERIAL_OUT_PORT_PIN)
 
 .if SERIAL_OUT_PORT_PIN = 0
 ;==============================================================================
@@ -238,3 +240,4 @@ _OUT_HI := SERIAL_OUT_PORT_DEFAULT | (1 << SERIAL_OUT_PORT_PIN)
 ;##############################################################################
 .endif
 ;##############################################################################
+.endif

@@ -11,7 +11,7 @@
 ;       - line input without echo at line speed
 ;
 ;   config:
-;       SERIAL_IN_REG               input register
+;       SERIAL_IN_PORT               input register
 ;       SERIAL_IN_PORT_PIN          port pin (must be 7)
 ;
 ;   requirements:
@@ -72,7 +72,7 @@
 ;------------------------------------------------------------------------------
 .local @wait
 @wait:    
-    bit SERIAL_IN_REG                   ; 4
+    bit SERIAL_IN_PORT                   ; 4
     ASSERT_BRANCH_PAGE bmi ,@wait       ; 3/2
 .endmacro
 
@@ -96,18 +96,18 @@
 ;------------------------------------------------------------------------------
 .local @wait
 @wait:    
-    bit SERIAL_IN_REG                   ; 4
+    bit SERIAL_IN_PORT                   ; 4
     ASSERT_BRANCH_PAGE bpl ,start       ; 3/2
     dec                                 ; 2
     bne @wait                           ; 3/2       
                                         ; 2815  total (11 * 256 - 1)
 
-    bit SERIAL_IN_REG                   ; 4
+    bit SERIAL_IN_PORT                   ; 4
     bpl start                           ; 3/2
     dey                                 ; 2 
     bne @wait                           ; 3/2       
 
-    bit SERIAL_IN_REG                   ; 4
+    bit SERIAL_IN_PORT                   ; 4
     bpl start                           ; 3/2
     dex                                 ; 2 
     ASSERT_BRANCH_PAGE bne ,@wait       ; 3/2       
@@ -134,13 +134,13 @@
 ;------------------------------------------------------------------------------
 .local @wait
 @wait:    
-    bit SERIAL_IN_REG                   ; 4
+    bit SERIAL_IN_PORT                   ; 4
     ASSERT_BRANCH_PAGE bpl ,start       ; 3/2
     dec                                 ; 2
     bne @wait                           ; 3/2       
                                         ; 2815  total (11 * 256 - 1)
 
-    bit SERIAL_IN_REG                   ; 4
+    bit SERIAL_IN_PORT                   ; 4
     bpl start                           ; 3/2
     dex                                 ; 2 
     ASSERT_BRANCH_PAGE bne ,@wait       ; 3/2       
@@ -161,28 +161,28 @@
 ;       - no initial delay
 ;       - fast enough to process data at line speed 8N1
 ;------------------------------------------------------------------------------
-    cpy SERIAL_IN_REG                   ; 4     lsb
+    cpy SERIAL_IN_PORT                   ; 4     lsb
     ror                                 ; 2
     DELAY11 
-    cpy SERIAL_IN_REG                   ; 4
+    cpy SERIAL_IN_PORT                   ; 4
     ror                                 ; 2
     DELAY11 
-    cpy SERIAL_IN_REG                   ; 4
+    cpy SERIAL_IN_PORT                   ; 4
     ror                                 ; 2
     DELAY12 
-    cpy SERIAL_IN_REG                   ; 4
+    cpy SERIAL_IN_PORT                   ; 4
     ror                                 ; 2
     DELAY11 
-    cpy SERIAL_IN_REG                   ; 4
+    cpy SERIAL_IN_PORT                   ; 4
     ror                                 ; 2
     DELAY11 
-    cpy SERIAL_IN_REG                   ; 4
+    cpy SERIAL_IN_PORT                   ; 4
     ror                                 ; 2
     DELAY12 
-    cpy SERIAL_IN_REG                   ; 4
+    cpy SERIAL_IN_PORT                   ; 4
     ror                                 ; 2
     DELAY11 
-    cpy SERIAL_IN_REG                   ; 4     msb
+    cpy SERIAL_IN_PORT                   ; 4     msb
     ror                                 ; 2
     eor #$FF                            ; 2     
 .endmacro
@@ -220,7 +220,7 @@
     nop                                 ; 2
     bcs @l2                             ; 3/2   adjust bit time, controlled by tuning bits
 @l2:        
-    cpy SERIAL_IN_REG                   ; 4
+    cpy SERIAL_IN_PORT                   ; 4
     ror                                 ; 2
     dex                                 ; 2    
     ASSERT_BRANCH_PAGE bne, @l1         ; 3/2
