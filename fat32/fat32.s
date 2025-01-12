@@ -44,9 +44,9 @@
 .include "config.inc"
 .include "tinylib65.inc"
 
-; .ifndef FAT32_DEBUG
-;     FAT32_DEBUG = DEBUG_NONE
-; .endif
+.ifndef FAT32_DEBUG
+    FAT32_DEBUG = 0
+.endif
 
 ;------------------------------------------------------------------------------
 ASSERT_ALIGNMENT fat32_buffer, 256
