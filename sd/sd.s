@@ -4,7 +4,7 @@
 ;
 ;   config:
 ;       SD_PORT                     output register
-;       SD_PORT_DEFAULT             output register default value
+;       SD_PORT_IDLE             output register default value
 ;       SD_PORT_PRESERVE            (preserve port state, not implemented)
 ;       SD_PORT_PIN_SCK             port pin for sck
 ;       SD_PORT_PIN_CS              port pin for cs
@@ -55,10 +55,10 @@
 ;   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 ;   SOFTWARE.
 ;------------------------------------------------------------------------------
-.ifdef SD_PORT
-
 .include "config.inc"
 .include "tinylib65.inc"
+
+.ifdef SD_PORT
 
 ;------------------------------------------------------------------------------
 .if SD_PORT_PRESERVE
@@ -74,8 +74,8 @@ BIT_CS   = (1 << SD_PORT_PIN_CS)
 BIT_MOSI = (1 << SD_PORT_PIN_MOSI)
 BIT_MISO = (1 << SD_PORT_PIN_MISO)
 
-.define BITS_CS_HI              SD_PORT_DEFAULT
-.define BITS_CS_LO              SD_PORT_DEFAULT & ~BIT_CS                        
+.define BITS_CS_HI              SD_PORT_IDLE
+.define BITS_CS_LO              SD_PORT_IDLE & ~BIT_CS                        
  
 ;------------------------------------------------------------------------------
 .rodata
@@ -96,7 +96,7 @@ cmd41_bytes:
 ;==============================================================================
 sd_init:
 ;------------------------------------------------------------------------------
-.if DEBUG_SD
+.if SD_DEBUG
     PRINTLN "sd_init"
 .endif
 ;------------------------------------------------------------------------------
@@ -112,7 +112,7 @@ sd_init:
 ;   - set mosi and cs high and apply 74 or more clock pulses to sclk 
 ;   - enter native operation mode 
 
-    lda #SD_PORT_DEFAULT
+    lda #SD_PORT_IDLE
     ldx #160               
 @l1:
     eor #BIT_SCK
@@ -203,7 +203,7 @@ sd_read_sector:                         ; (sector32 addr --)
 ;       Z           1 / 0
 ;       A           0 / <error code>
 ;------------------------------------------------------------------------------
-.if DEBUG_SD
+.if SD_DEBUG
     lda #'R'
     jsr print_char_space
     PRINT_HEX32 { stack + 2, x }

@@ -37,19 +37,6 @@
 .include "macros/macros_stack.inc"
 
 ;==============================================================================
-;   default values
-;------------------------------------------------------------------------------
-.ifndef DEBUG_SD
-    .define DEBUG_SD                0
-.endif
-.ifndef DEBUG_FAT32
-    .define DEBUG_FAT32             0
-.endif
-.ifndef print_char
-    .define print_char              serial_out_char
-.endif
-
-;==============================================================================
 ;   external symbols (to be provided by the user)
 ;------------------------------------------------------------------------------
 ;   bss data

@@ -100,7 +100,7 @@ fat32_init:
 ;       C           0: failed, 1: ok
 ;       last_error  0: ok
 ;------------------------------------------------------------------------------
-.if DEBUG_FAT32
+.if FAT32_DEBUG
     PRINTLN "fat32_init"
 .endif
 
@@ -160,7 +160,7 @@ fat32_init:
     ;   push lba_begin
     X_PUSH_MEM32 { fat32_buffer + MBR_LBA_BEGIN, y }
 
-.if DEBUG_FAT32 >= 2
+.if FAT32_DEBUG >= 2
     PRINT_HEX32 { stack, x }
     PRINTLN " lba_begin"
 .endif
@@ -242,7 +242,7 @@ fat32_init:
     CPY32 root_dir_first_cluster, fat32_buffer + BPB_ROOTCLUS
 
 
-.if DEBUG_FAT32 >= 2
+.if FAT32_DEBUG >= 2
     PRINT_HEX32 fat_begin_lba
     PRINTLN " fat_begin_lba"
 
@@ -268,7 +268,7 @@ fat32_openrootdir:
 ;------------------------------------------------------------------------------
 ;   open root directory
 ;------------------------------------------------------------------------------
-.if DEBUG_FAT32 >= 2
+.if FAT32_DEBUG >= 2
     PRINTLN "fat32_openrootdir"
 .endif
 
@@ -293,7 +293,7 @@ fat32_readdir:
 ;   output:   
 ;       C       1: success, 0: no more files
 ;------------------------------------------------------------------------------
-.if DEBUG_FAT32 >= 2
+.if FAT32_DEBUG >= 2
     PRINTLN "fat32_readdir"
 .endif
 
@@ -395,7 +395,7 @@ fat32_loadfile:                         ; ( addr -- )
     bne @done                           ; file too large
 
 @next_sector:
-.if DEBUG_FAT32 >= 2
+.if FAT32_DEBUG >= 2
     lda remaining_bytes + 1
     jsr print_hex8
     lda remaining_bytes
@@ -476,7 +476,7 @@ _read_sector_cached:                    ; ( sector32 addr -- )
     ;   check sector
     CMP32_MEM32 loaded_sector, { stack + 2, x } 
     beq @cache_hit
-.if DEBUG_FAT32 >= 2
+.if FAT32_DEBUG >= 2
     PRINTLN "cache miss"
 .endif
     CPY32 loaded_sector, { stack + 2, x }
@@ -485,7 +485,7 @@ _read_sector_cached:                    ; ( sector32 addr -- )
     jmp sd_read_sector
 
 @cache_hit:
-.if DEBUG_FAT32 >= 2
+.if FAT32_DEBUG >= 2
     PRINTLN "cache hit"
 .endif
     sec
