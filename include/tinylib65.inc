@@ -37,6 +37,14 @@
 .include "macros/macros_stack.inc"
 
 ;==============================================================================
+;   helper symbols (required to make .ifdef work)
+;------------------------------------------------------------------------------
+DEBUG_NONE      = 0
+DEBUG_INFO      = 1
+DEBUG_VERBOSE   = 2
+DEBUG_TRACE     = 3
+
+;==============================================================================
 ;   external symbols (to be provided by the user)
 ;------------------------------------------------------------------------------
 ;   bss data
@@ -110,7 +118,10 @@ FAT32_ERR_BPB       = FAT32_ERR_BASE + 2
 ;------------------------------------------------------------------------------
 ;   print
 
-.global     print_hex4
+.ifndef print_char
+    print_char = serial_out_char
+.endif
+
 .global     print_hex8
 .global     print_hex16_w0
 .global     print_hex16_ay
