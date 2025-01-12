@@ -101,6 +101,7 @@ FAT32_ERR_BPB       = FAT32_ERR_BASE + 2
 
 .globalzp   input_idx
 
+.global     input_read
 .global     input_char
 .global     input_skip_spaces
 .global     input_hex
@@ -118,10 +119,8 @@ FAT32_ERR_BPB       = FAT32_ERR_BASE + 2
 ;------------------------------------------------------------------------------
 ;   print
 
-.ifndef print_char
-    print_char = serial_out_char
-.endif
-
+.global     print_char
+.global     print_hex4
 .global     print_hex8
 .global     print_hex16_w0
 .global     print_hex16_ay

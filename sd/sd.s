@@ -4,12 +4,12 @@
 ;
 ;   config:
 ;       SD_PORT                     output register
-;       SD_PORT_IDLE             output register default value
-;       SD_PORT_PRESERVE            (preserve port state, not implemented)
+;       SD_PORT_IDLE                output register default value
 ;       SD_PORT_PIN_SCK             port pin for sck
 ;       SD_PORT_PIN_CS              port pin for cs
 ;       SD_PORT_PIN_MOSI            port pin for mosi      
 ;       SD_PORT_PIN_MISO            port pin for miso
+;       SD_PORT_SAVE                (preserve port state, not implemented)
 ;       SD_CA2_SCK                  (use ca2 for sck, not implemented)
 ;
 ;   requirements:
@@ -61,21 +61,21 @@
 .ifdef SD_PORT
 
 ;------------------------------------------------------------------------------
-.if SD_PORT_PRESERVE
-    .error "SD_PORT_PRESERVE is not implemented"
+.if SD_PORT_SAVE
+    .error "SD_PORT_SAVE is not implemented"
 .endif
 .if SD_CA2_SCK
     .error "SD_CA2_SCK is not implemented"
 .endif
 
 ;------------------------------------------------------------------------------
-BIT_SCK  = (1 << SD_PORT_PIN_SCK)
-BIT_CS   = (1 << SD_PORT_PIN_CS)
-BIT_MOSI = (1 << SD_PORT_PIN_MOSI)
-BIT_MISO = (1 << SD_PORT_PIN_MISO)
+BIT_SCK     = (1 << SD_PORT_PIN_SCK)
+BIT_CS      = (1 << SD_PORT_PIN_CS)
+BIT_MOSI    = (1 << SD_PORT_PIN_MOSI)
+BIT_MISO    = (1 << SD_PORT_PIN_MISO)
 
-.define BITS_CS_HI              SD_PORT_IDLE
-.define BITS_CS_LO              SD_PORT_IDLE & ~BIT_CS                        
+BITS_CS_HI  = SD_PORT_IDLE
+BITS_CS_LO  = SD_PORT_IDLE & ~BIT_CS                        
  
 ;------------------------------------------------------------------------------
 .rodata
