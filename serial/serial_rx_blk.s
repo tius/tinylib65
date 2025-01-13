@@ -1,6 +1,9 @@
-;   serial_in_xmodem.s
-;   
-;   see also serial_in.inc
+;   serial_rx_blk.s
+;
+;   read block with len byte at wire speed, timeout 0.72 s per byte
+;
+;   see also: 
+;       - serial_rx.inc
 ;       
 ;------------------------------------------------------------------------------
 ;   MIT License
@@ -28,38 +31,36 @@
 .include "config.inc"
 .include "tinylib65.inc"
 
-.ifdef SERIAL_IN_PORT
+.if 0
 
-.include "serial_in.inc"
+.include "serial_rx.inc"
 
 ;==============================================================================
-serial_in_xmodem:
+serial_rx_blk:
 ;------------------------------------------------------------------------------
-;   read 132 byte xmodem block at wire speed with timeout
+;   read block with len byte at wire speed, timeout 0.72 s per byte
+;
+;   requriments:
+;       buffer      256 bytes
 ;
 ;   changed:
 ;       X
-;   output:     
-;       input_buffer
-;       A           no. of bytes received           
-;       Z           Z=0: data received, Z=1: timeout on 1st byte
-;       C           C=0: timeout, C=1 full block received
 ;
-;   remarks:
-;       - timeout ~10 s for 1st byte
-;       - timeout ~0.4 s for remaining bytes
+;   output:
+;       C           1: ok, 0: timeout
+;       X           0
+;       Y           no. of bytes received
+;       buffer      received bytes
+;
 ;------------------------------------------------------------------------------
-    phy
-    stz tmp0
-    ldx #SERIAL_IN_TIMEOUT_10S          ; initial timeout 10s
-
-    SKIP2                               ; skip next 2-byte instruction
+    ldy #0                              ; byte counter
+    ldx #0                              ; 0.72 s initial timeout
 
 @loop:    
-    ldx #1                              ; 2     byte timeout 0.4s (with Y = 127)
-    WAIT_TIMEOUT @start                 ; 7 + 11 cycles jitter
+    WAIT_TIMEOUT_SHORT @start           ; 7 + 11 cycles jitter
     clc                                 ; timeout                                      
-    bra @done
+    rts
+
 ;       26.5    cycles required until next sampling
 ;   -    7      delay by WAIT_TIMEOUT
 ;   -    5.5    jitter / 2 by WAIT_TIMEOUT
@@ -67,21 +68,20 @@ serial_in_xmodem:
 ;   =    7      cycles needed until INPUT_BYTE_SHORT
 
 @start:
+    iny                                 ; 2
+    phy                                 ; 3
+
     ldy #$7f                            ; 2
-    inc tmp0                            ; 5
-    INPUT_BYTE_SHORT                    ; 140 (7 initial delay)
+    INPUT_BYTE_SHORT                    ; 140 (7 initial delay), X = 0
 
-    ldx tmp0                            ; 3
-    sta input_buffer - 1, x             ; 5
-    cpx #132                            ; 2
-    ASSERT_BRANCH_PAGE bcc ,@loop       ; 3/2
+    ply                                 ; 4
+    sta serial_buffer - 1, y            ; 5
 
-;   total loop time 169 cycles
-
-@done:    
-    ply
-    lda tmp0
-    rts
+    cpy serial_buffer                   ; 4     1st byte is size
+    ASSERT_BRANCH_PAGE bne, @loop       ; 3/2
+                                        ; 170   total loop time
+;   C = 1
+    rts                                  
 
 ;==============================================================================
 .endif

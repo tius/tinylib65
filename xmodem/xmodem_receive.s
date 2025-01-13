@@ -55,8 +55,8 @@ block_chksum    := input_buffer + 131
     lda #NAK
 
 @loop:    
-    jsr serial_out_char
-    jsr serial_in_xmodem
+    jsr serial_tx_byte
+    jsr serial_rx_xmodem
     beq @nak_block                  ; timeout 1st byte
 
     lda block_type
@@ -114,7 +114,7 @@ block_chksum    := input_buffer + 131
 
 @ack_eot:
     lda #ACK
-    jsr serial_out_char
+    jsr serial_tx_byte
     sec
 
 @return:

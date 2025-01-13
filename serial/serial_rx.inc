@@ -1,4 +1,4 @@
-;   serial_in.inc
+;   serial_rx.inc
 
 ;   bit-bang 57600 baud software serial input
 ;
@@ -11,8 +11,8 @@
 ;       - line input without echo at line speed
 ;
 ;   config:
-;       SERIAL_IN_PORT               input register
-;       SERIAL_IN_PORT_PIN          port pin (must be 7)
+;       SERIAL_RX_PORT               input register
+;       SERIAL_RX_PORT_PIN          port pin (must be 7)
 ;
 ;   requirements:
 ;       - port pin must initialized to input
@@ -58,10 +58,10 @@
 ;   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 ;   SOFTWARE.
 ;------------------------------------------------------------------------------
-.if SERIAL_IN_PORT_PIN = 7
+.if SERIAL_RX_PORT_PIN = 7
     .out "using optimized code for port pin 7"
 .else
-    .error "SERIAL_IN_PORT_PIN must be 7"
+    .error "SERIAL_RX_PORT_PIN must be 7"
 .endif
 
 ;==============================================================================
@@ -72,7 +72,7 @@
 ;------------------------------------------------------------------------------
 .local @wait
 @wait:    
-    bit SERIAL_IN_PORT                   ; 4
+    bit SERIAL_RX_PORT                   ; 4
     ASSERT_BRANCH_PAGE bmi ,@wait       ; 3/2
 .endmacro
 
@@ -96,18 +96,18 @@
 ;------------------------------------------------------------------------------
 .local @wait
 @wait:    
-    bit SERIAL_IN_PORT                   ; 4
+    bit SERIAL_RX_PORT                   ; 4
     ASSERT_BRANCH_PAGE bpl ,start       ; 3/2
     dec                                 ; 2
     bne @wait                           ; 3/2       
                                         ; 2815  total (11 * 256 - 1)
 
-    bit SERIAL_IN_PORT                   ; 4
+    bit SERIAL_RX_PORT                   ; 4
     bpl start                           ; 3/2
     dey                                 ; 2 
     bne @wait                           ; 3/2       
 
-    bit SERIAL_IN_PORT                   ; 4
+    bit SERIAL_RX_PORT                   ; 4
     bpl start                           ; 3/2
     dex                                 ; 2 
     ASSERT_BRANCH_PAGE bne ,@wait       ; 3/2       
@@ -134,13 +134,13 @@
 ;------------------------------------------------------------------------------
 .local @wait
 @wait:    
-    bit SERIAL_IN_PORT                   ; 4
+    bit SERIAL_RX_PORT                   ; 4
     ASSERT_BRANCH_PAGE bpl ,start       ; 3/2
     dec                                 ; 2
     bne @wait                           ; 3/2       
                                         ; 2815  total (11 * 256 - 1)
 
-    bit SERIAL_IN_PORT                   ; 4
+    bit SERIAL_RX_PORT                   ; 4
     bpl start                           ; 3/2
     dex                                 ; 2 
     ASSERT_BRANCH_PAGE bne ,@wait       ; 3/2       
@@ -161,28 +161,28 @@
 ;       - no initial delay
 ;       - fast enough to process data at line speed 8N1
 ;------------------------------------------------------------------------------
-    cpy SERIAL_IN_PORT                   ; 4     lsb
+    cpy SERIAL_RX_PORT                   ; 4     lsb
     ror                                 ; 2
     DELAY11 
-    cpy SERIAL_IN_PORT                   ; 4
+    cpy SERIAL_RX_PORT                   ; 4
     ror                                 ; 2
     DELAY11 
-    cpy SERIAL_IN_PORT                   ; 4
+    cpy SERIAL_RX_PORT                   ; 4
     ror                                 ; 2
     DELAY12 
-    cpy SERIAL_IN_PORT                   ; 4
+    cpy SERIAL_RX_PORT                   ; 4
     ror                                 ; 2
     DELAY11 
-    cpy SERIAL_IN_PORT                   ; 4
+    cpy SERIAL_RX_PORT                   ; 4
     ror                                 ; 2
     DELAY11 
-    cpy SERIAL_IN_PORT                   ; 4
+    cpy SERIAL_RX_PORT                   ; 4
     ror                                 ; 2
     DELAY12 
-    cpy SERIAL_IN_PORT                   ; 4
+    cpy SERIAL_RX_PORT                   ; 4
     ror                                 ; 2
     DELAY11 
-    cpy SERIAL_IN_PORT                   ; 4     msb
+    cpy SERIAL_RX_PORT                   ; 4     msb
     ror                                 ; 2
     eor #$FF                            ; 2     
 .endmacro
@@ -220,7 +220,7 @@
     nop                                 ; 2
     bcs @l2                             ; 3/2   adjust bit time, controlled by tuning bits
 @l2:        
-    cpy SERIAL_IN_PORT                   ; 4
+    cpy SERIAL_RX_PORT                   ; 4
     ror                                 ; 2
     dex                                 ; 2    
     ASSERT_BRANCH_PAGE bne, @l1         ; 3/2

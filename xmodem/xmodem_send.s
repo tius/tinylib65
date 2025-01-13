@@ -46,16 +46,16 @@ xmodem_send:
 ;       - garbage data sent at end of last block
 ;------------------------------------------------------------------------------
 ;   wait for initial nak
-    ldx #SERIAL_IN_TIMEOUT_60S
+    ldx #SERIAL_RX_TIMEOUT_60S
 @wait_nak:
-    jsr serial_in_char_timeout
+    jsr serial_rx_byte_timeout
     bcc @timeout                ; timeout
     cmp #NAK
     bne @wait_nak
     stz tmp1                    ; block #
 
 @next_block:    
-    ldx #SERIAL_IN_TIMEOUT_60S
+    ldx #SERIAL_RX_TIMEOUT_60S
     inc tmp1
 
 ;   done?
@@ -65,28 +65,28 @@ xmodem_send:
 
 @send_block:    
     lda #SOH
-    jsr serial_out_char
+    jsr serial_tx_byte
     lda tmp1                    ; block #
-    jsr serial_out_char
+    jsr serial_tx_byte
     lda tmp1
     eor #$FF
-    jsr serial_out_char       ; invers block # 
+    jsr serial_tx_byte       ; invers block # 
     ldy #0                      
     tya                         ; chksum
 
 @loop:    
     pha
     lda (w0), y
-    jsr serial_out_char
+    jsr serial_tx_byte
     pla
     clc
     adc (w0), y
     iny
     bpl @loop
-    jsr serial_out_char       ; chksum
+    jsr serial_tx_byte       ; chksum
     
 @wait_ack:
-    jsr serial_in_char_timeout
+    jsr serial_rx_byte_timeout
     bcc @timeout                
     cmp #NAK
     beq @send_block
@@ -102,10 +102,10 @@ xmodem_send:
 
 @send_eot:
     lda #EOT
-    jsr serial_out_char
+    jsr serial_tx_byte
 
 @wait_ack_eot:
-    jsr serial_in_char_timeout
+    jsr serial_rx_byte_timeout
     bcc @timeout                
     cmp #NAK
     beq @send_eot

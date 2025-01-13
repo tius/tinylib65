@@ -27,7 +27,7 @@
 ;------------------------------------------------------------------------------
 
 ;==============================================================================
-;   compiler settings
+;   assembler settings
 ;------------------------------------------------------------------------------
 .pc02                                   ; allow 65c02 opcodes
 .feature string_escapes                 ; allow \r \n ...
@@ -51,7 +51,7 @@
 
 .global     input_buffer
 .global     fat32_buffer
-.global     serial_buffer           ; for serial_in_blk
+; .global     serial_buffer           ; for serial_rx_blk
 
 ;==============================================================================
 ;   modules
@@ -153,23 +153,23 @@ SD_ERR_READ         = SD_ERR_BASE + 5
 ;------------------------------------------------------------------------------
 ;   serial 
 
-.global     serial_out_char
+.global     serial_tx_byte
 
 ;------------------------------------------------------------------------------
 ;   serial input
 
 ;   timeout values
-SERIAL_IN_TIMEOUT_2S   := 3
-SERIAL_IN_TIMEOUT_10S  := 14
-SERIAL_IN_TIMEOUT_60S  := 83
+SERIAL_RX_TIMEOUT_2S   := 3
+SERIAL_RX_TIMEOUT_10S  := 14
+SERIAL_RX_TIMEOUT_60S  := 83
 
-.globalzp   serial_in_echo
-.global     serial_in_char
-.global     serial_in_line
-.global     serial_in_xmodem
-.global     serial_in_char_timeout
-.global     serial_in_mem
-.global     serial_in_blk
+.globalzp   serial_rx_echo
+.global     serial_rx_byte
+.global     serial_rx_line
+.global     serial_rx_xmodem
+.global     serial_rx_byte_timeout
+.global     serial_rx_mem
+.global     serial_rx_blk
 
 ;------------------------------------------------------------------------------
 ;   x_stack

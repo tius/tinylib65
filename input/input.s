@@ -37,10 +37,10 @@ input_idx:          .res 1
 
 .code
 ;==============================================================================
-;   default input from serial_in
+;   default input from serial_rx
 ;------------------------------------------------------------------------------
 .ifndef input_read
-    input_read := serial_in_line
+    input_read := serial_rx_line
 .endif    
 
 ;==============================================================================

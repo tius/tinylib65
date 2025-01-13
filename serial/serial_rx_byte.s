@@ -1,6 +1,6 @@
-;   serial_in_char.s
+;   serial_rx_byte.s
 ;   
-;   see also serial_in.inc
+;   see also serial_rx.inc
 ;       
 ;------------------------------------------------------------------------------
 ;   MIT License
@@ -28,12 +28,12 @@
 .include "config.inc"
 .include "tinylib65.inc"
 
-.ifdef SERIAL_IN_PORT
+.ifdef SERIAL_RX_PORT
 
-.include "serial_in.inc"
+.include "serial_rx.inc"
 
 ;==============================================================================
-serial_in_char_timeout:
+serial_rx_byte_timeout:
 ;------------------------------------------------------------------------------
 ;   receive one byte with timeout
 ;
@@ -66,7 +66,7 @@ serial_in_char_timeout:
 ;   =    7      cycles needed until INPUT_BYTE_SHORT
 
 ;==============================================================================
-serial_in_char:
+serial_rx_byte:
 ;------------------------------------------------------------------------------
 ;   receive one byte (blocking)
 ;
@@ -96,7 +96,7 @@ _in_byte:
     INPUT_BYTE_SHORT                    ; 140   (7 initial delay)
     plx                                 ; 4
     ply                                 ; 4
-    sec                                 ; 2     required for serial_in_char_timeout
+    sec                                 ; 2     required for serial_rx_byte_timeout
     rts                                 ; 6     (+ 6 for jsr)
 
 ;==============================================================================

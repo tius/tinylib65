@@ -1,9 +1,7 @@
-;   serial_in_blk.s
-;
-;   read block with len byte at wire speed, timeout 0.72 s per byte
+;   serial_rx_mem.s
 ;
 ;   see also: 
-;       - serial_in.inc
+;       - serial_rx.inc
 ;       
 ;------------------------------------------------------------------------------
 ;   MIT License
@@ -31,28 +29,31 @@
 .include "config.inc"
 .include "tinylib65.inc"
 
-.ifdef SERIAL_IN_PORT
+.ifdef SERIAL_RX_PORT
 
-.include "serial_in.inc"
+.include "serial_rx.inc"
 
 ;==============================================================================
-serial_in_blk:
+serial_rx_mem:
 ;------------------------------------------------------------------------------
-;   read block with len byte at wire speed, timeout 0.72 s per byte
+;   read block of 1..256 bytes at wire speed, timeout 0.72 s per byte
 ;
-;   requriments:
-;       buffer      256 bytes
+;   input:
+;       tmp0        target address low byte
+;       tmp1        target address high byte
+;       tmp2        no. of bytes to read
 ;
 ;   changed:
-;       X
+;       X, Y, tmp2
 ;
 ;   output:
 ;       C           1: ok, 0: timeout
-;       Y           no. of bytes received
-;       buffer      received bytes
+;       Y           no. of bytes received - 1
 ;
 ;------------------------------------------------------------------------------
-    ldy #0                              ; byte counter
+    ldy #$ff                            ; y is incremented at start of loop
+    dec tmp2                            ; y is compared before increment
+
     ldx #0                              ; 0.72 s initial timeout
 
 @loop:    
@@ -74,9 +75,9 @@ serial_in_blk:
     INPUT_BYTE_SHORT                    ; 140 (7 initial delay), X = 0
 
     ply                                 ; 4
-    sta serial_buffer - 1, y            ; 5
+    sta (tmp0), y                       ; 6
 
-    cpy serial_buffer                   ; 4     1st byte is size
+    cpy tmp2                            ; 3
     ASSERT_BRANCH_PAGE bne, @loop       ; 3/2
                                         ; 170   total loop time
 ;   C = 1

@@ -27,7 +27,7 @@
 ;------------------------------------------------------------------------------
 
 .macro DELAY1
-    .byte $FB               ; 2 (65c02 only)
+    .byte $FB               ; 1     hack, 65c02 only (!)
 .endmacro
 
 .macro DELAY2

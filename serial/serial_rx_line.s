@@ -1,6 +1,6 @@
-;   serial_in_line.s
+;   serial_rx_line.s
 ;   
-;   see also serial_in.inc
+;   see also serial_rx.inc
 ;       
 ;------------------------------------------------------------------------------
 ;   MIT License
@@ -28,18 +28,18 @@
 .include "config.inc"
 .include "tinylib65.inc"
 
-.ifdef SERIAL_IN_PORT
+.ifdef SERIAL_RX_PORT
 
-.include "serial_in.inc"
+.include "serial_rx.inc"
 
 ;==============================================================================
 .zeropage
 ;------------------------------------------------------------------------------
-serial_in_echo:     .res 1
+serial_rx_echo:     .res 1
 
 .code
 ;==============================================================================
-serial_in_line:
+serial_rx_line:
 ;------------------------------------------------------------------------------
 ;   read line with optional echo (blocking)
 ;   
@@ -54,11 +54,11 @@ serial_in_line:
 ;       - backspace removes last character from buffer (if any)
 ;       - does not work at wire speed if echo is enabled (half-duplex)
 ;------------------------------------------------------------------------------
-    lda serial_in_echo
-    beq serial_in_line_no_echo
+    lda serial_rx_echo
+    beq serial_rx_line_no_echo
     ldx #0                      
 @loop:
-    jsr serial_in_char
+    jsr serial_rx_byte
     
     cmp #$7f
     bcs @loop                
@@ -77,17 +77,17 @@ serial_in_line:
 @backspace:
     cpx #0
     beq @loop
-    jsr serial_out_char       
+    jsr serial_tx_byte       
     lda #$20
-    jsr serial_out_char       
+    jsr serial_tx_byte       
     lda #$08
-    jsr serial_out_char       
+    jsr serial_tx_byte       
     dex      
     bra @loop               
 
 @printable:    
     sta input_buffer, x   
-    jsr serial_out_char       
+    jsr serial_tx_byte       
     inx      
     bpl @loop
 
@@ -95,10 +95,10 @@ serial_in_line:
     stz input_buffer, x
     stz input_idx
     lda #$0d
-    jmp serial_out_char
+    jmp serial_tx_byte
 
 ;==============================================================================
-serial_in_line_no_echo:
+serial_rx_line_no_echo:
 ;------------------------------------------------------------------------------
 ;   read line without echo at wire speed (blocking)
 ;   

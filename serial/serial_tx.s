@@ -1,15 +1,15 @@
-;   serial_out.s
+;   serial_tx.s
 ;
 ;   bit-bang 57600 baud software serial output
 ;
 ;   config:
-;       SERIAL_OUT_PORT             output register
-;       SERIAL_OUT_PORT_PIN         output pin number (0 for fastest code)
-;       SERIAL_OUT_PORT_IDLE     output register default state
-;       SERIAL_OUT_PORT_PRESERVE    preserve output port state
+;       SERIAL_TX_PORT             output register
+;       SERIAL_TX_PORT_PIN         output pin number (0 for fastest code)
+;       SERIAL_TX_PORT_IDLE        output register default state
+;       SERIAL_TX_PORT_PRESERVE    preserve output port state
 ;
 ;   requirements:
-;       - data direction register set to output for SERIAL_OUT_BIT
+;       - data direction register set to output for SERIAL_TX_BIT
 ;       - output register initialized for output high
 ;
 ;   caveat:
@@ -18,7 +18,7 @@
 ;   remarks:
 ;       - half-duplex only
 ;       - correct bit time is 17.36 cycles, tight timing is required
-;       - simple timing 19/17/17/17/17/17/17/17/18 is precise enough for tx
+;       - simplified timing 19/17/17/17/17/17/17/17/18 is precise enough for tx
 ;       - maximum waveform timing error is 1.64 cycles
 ;       - branches must not cross pages for correct timing 
 ;       - using bit 0 allows faster and smaller code
@@ -50,33 +50,33 @@
 .include "config.inc"
 .include "tinylib65.inc"
 
-.ifdef SERIAL_OUT_PORT
+.ifdef SERIAL_TX_PORT
 
 .code
 ;==============================================================================
-serial_out_char:
+serial_tx_byte:
 ;==============================================================================
 
-.if SERIAL_OUT_PORT_SAVE
+.if SERIAL_TX_PORT_SAVE
 ;##############################################################################
 ;   preserve output port state
 ;
 ;   caveats:
-;       - reading SERIAL_OUT_PORT actually reads the input port on 65x22
+;       - reading SERIAL_TX_PORT actually reads the input port on 65x22
 ;       - this may not always reflect the actual output state
 ;##############################################################################
 
-.if SERIAL_OUT_PORT_PIN = 0
+.if SERIAL_TX_PORT_PIN = 0
 ;==============================================================================
-.out "using optimized serial_out_char for bit 0"
+.out "using optimized serial_tx_byte for bit 0"
 ;------------------------------------------------------------------------------
 ;   in:
 ;       A       byte to transmit
 ;------------------------------------------------------------------------------
     sta tmp0                            ; 3
-    lda SERIAL_OUT_PORT                 ; 4
+    lda SERIAL_TX_PORT                 ; 4
     and #$FE                            ; 2     
-    sta SERIAL_OUT_PORT                 ; 4     start bit
+    sta SERIAL_TX_PORT                 ; 4     start bit
     sec                                 ; 2     end of byte marker
     ror tmp0                            ; 5     tmp0 = $80, c = 0
     DELAY6                              ; 6     
@@ -85,7 +85,7 @@ serial_out_char:
     ;   repeat 8 times          
 @l0:        
     adc #$00                            ; 2
-    sta SERIAL_OUT_PORT                 ; 4     
+    sta SERIAL_TX_PORT                 ; 4     
     and #$FE                            ; 2
     lsr a:tmp0                          ; 6     use absolute addressing (!)
     ASSERT_BRANCH_PAGE bne, @l0         ; 3/2   zero after last data bit
@@ -93,14 +93,14 @@ serial_out_char:
 
     ora #$01                            ; 2
     nop                                 ; 2
-    sta SERIAL_OUT_PORT                 ; 4     
+    sta SERIAL_TX_PORT                 ; 4     
     rts                                 ; 6
                                         ; 14
 ;   total 175 = 26 + 135 + 14                                                
 
 .else
 ;==============================================================================
-.out "using default serial_out_char"
+.out "using default serial_tx_byte"
 ;------------------------------------------------------------------------------
 ;   in:
 ;       A       byte to transmit
@@ -110,14 +110,14 @@ serial_out_char:
 
     ;   load x and y with bit masks for hi and lo output
     pha                                 ; 3
-    lda SERIAL_OUT_PORT                 ; 4
-    ora #1 << SERIAL_OUT_BIT            ; 2
+    lda SERIAL_TX_PORT                 ; 4
+    ora #1 << SERIAL_TX_BIT            ; 2
     tax                                 ; 2
-    and #$FF ^ (1 << SERIAL_OUT_BIT)    ; 2
+    and #$FF ^ (1 << SERIAL_TX_BIT)    ; 2
     tay                                 ; 2
     pla                                 ; 4
 
-    sty SERIAL_OUT_PORT                 ; 4     start bit
+    sty SERIAL_TX_PORT                 ; 4     start bit
     sec                                 ; 2     end of byte marker
     ror                                 ; 2
     DELAY6                              ; 6 
@@ -127,11 +127,11 @@ serial_out_char:
 @l0:	    
     bcc @l1		                        ; 3/2 	
     DELAY3                              ; 3
-    stx	SERIAL_OUT_PORT                 ; 4
+    stx	SERIAL_TX_PORT                 ; 4
     bcs @l2		                        ; 3
 @l1:		                    
     DELAY2                              ; 2
-    sty SERIAL_OUT_PORT                 ; 4			
+    sty SERIAL_TX_PORT                 ; 4			
     DELAY3                              ; 3
 @l2:		                    
     lsr			                        ; 2
@@ -139,7 +139,7 @@ serial_out_char:
                                         ; 17    total 135 = 17 * 8 - 1
 
     DELAY7                              ; 7
-    stx SERIAL_OUT_PORT                 ; 4     stop bit
+    stx SERIAL_TX_PORT                 ; 4     stop bit
     plx                                 ; 4
     ply                                 ; 4
     rts                                 ; 6
@@ -154,21 +154,21 @@ serial_out_char:
 ;   do NOT preserve output port state
 ;
 ;   caveat:
-;       - resets output port to SERIAL_OUT_PORT_IDLE after each byte    
+;       - resets output port to SERIAL_TX_PORT_IDLE after each byte    
 ;##############################################################################
-_OUT_LO := SERIAL_OUT_PORT_IDLE ^ (1 << SERIAL_OUT_PORT_PIN) 
-_OUT_HI := SERIAL_OUT_PORT_IDLE | (1 << SERIAL_OUT_PORT_PIN)
+_OUT_LO := SERIAL_TX_PORT_IDLE ^ (1 << SERIAL_TX_PORT_PIN) 
+_OUT_HI := SERIAL_TX_PORT_IDLE | (1 << SERIAL_TX_PORT_PIN)
 
-.if SERIAL_OUT_PORT_PIN = 0
+.if SERIAL_TX_PORT_PIN = 0
 ;==============================================================================
-.out "using optimized serial_out_char for bit 0, trashing output port state"
+.out "using optimized serial_tx_byte for bit 0, trashing output port state"
 ;------------------------------------------------------------------------------
 ;   in:
 ;       A       byte to transmit
 ;------------------------------------------------------------------------------
     sta tmp0                            ; 3
     lda #_OUT_LO                        ; 2
-    sta SERIAL_OUT_PORT                 ; 4     start bit
+    sta SERIAL_TX_PORT                 ; 4     start bit
     sec                                 ; 2     end of byte marker
     ror tmp0                            ; 5     tmp0 = $80, c = 0
     DELAY6                              ; 6     
@@ -177,7 +177,7 @@ _OUT_HI := SERIAL_OUT_PORT_IDLE | (1 << SERIAL_OUT_PORT_PIN)
     ;   repeat 8 times          
 @l0:        
     adc #$00                            ; 2
-    sta SERIAL_OUT_PORT                 ; 4     
+    sta SERIAL_TX_PORT                 ; 4     
     lda #_OUT_LO                        ; 2
     lsr a:tmp0                          ; 6     use absolute addressing (!)
     ASSERT_BRANCH_PAGE bne, @l0         ; 3/2   zero after last data bit
@@ -185,14 +185,14 @@ _OUT_HI := SERIAL_OUT_PORT_IDLE | (1 << SERIAL_OUT_PORT_PIN)
 
     lda #_OUT_HI                        ; 2     stop bit
     nop                                 ; 2
-    sta SERIAL_OUT_PORT                 ; 4     
+    sta SERIAL_TX_PORT                 ; 4     
     rts                                 ; 6
                                         ; 14
 ;   total 171 = 22 + 135 + 14                                                
 
 .else
 ;==============================================================================
-.out "using default serial_out_char, trashing output port state"
+.out "using default serial_tx_byte, trashing output port state"
 ;------------------------------------------------------------------------------
 ;   in:
 ;       A       byte to transmit
@@ -201,7 +201,7 @@ _OUT_HI := SERIAL_OUT_PORT_IDLE | (1 << SERIAL_OUT_PORT_PIN)
 
     ;   load x and y with bit masks for hi and lo output
     ldx #_OUT_LO                        ; 2
-    stx SERIAL_OUT_PORT                 ; 4     start bit
+    stx SERIAL_TX_PORT                 ; 4     start bit
     sec                                 ; 2     end of byte marker
     ror                                 ; 2
     DELAY6                              ; 6 
@@ -212,11 +212,11 @@ _OUT_HI := SERIAL_OUT_PORT_IDLE | (1 << SERIAL_OUT_PORT_PIN)
     bcc @l1		                        ; 3/2 	
     DELAY1                              ; 1
     ldx #_OUT_HI                        ; 2
-    stx	SERIAL_OUT_PORT                 ; 4
+    stx	SERIAL_TX_PORT                 ; 4
     bcs @l2		                        ; 3
 @l1:		                    
     ldx #_OUT_LO                        ; 2
-    stx SERIAL_OUT_PORT                 ; 4			
+    stx SERIAL_TX_PORT                 ; 4			
     DELAY3                              ; 3
 @l2:		                    
     lsr			                        ; 2
@@ -225,7 +225,7 @@ _OUT_HI := SERIAL_OUT_PORT_IDLE | (1 << SERIAL_OUT_PORT_PIN)
 
     DELAY5                              ; 5
     ldx #_OUT_HI                        ; 2
-    stx SERIAL_OUT_PORT                 ; 4     stop bit
+    stx SERIAL_TX_PORT                 ; 4     stop bit
 
     plx                                 ; 4
     rts                                 ; 6
